@@ -4,8 +4,15 @@ using UnityEngine;
 
 public class Player: MonoBehaviour
 {
+    public int damage =1;
+    public int score;
+    //--Health
     public int health = 3;
     public bool playerIsDead;
+    public float timeInvincible;
+    public float timeBetweenFlashes;
+    bool isInvincible;
+    float invicibilityTimer;
     //--Movement
     public float jumpForce = 3f;
     public float groundCheckRadius;
@@ -15,17 +22,25 @@ public class Player: MonoBehaviour
     bool stoppedJumping;
     Rigidbody2D rb;
     float jumpTimeCounter;
-    //--Movement
     private void Start()
     {
         playerIsDead = false;
         //--Movement
         jumpTimeCounter = jumpMaxTime;
         rb = GetComponent<Rigidbody2D>();
-        //--Movement
     }
     void Update()
     {
+        //this.GetComponent<Animator>().SetFloat("AnimSpeed")
+        if (isInvincible)
+        {
+            invicibilityTimer -= Time.deltaTime;
+            if(invicibilityTimer <=0)
+            {
+                isInvincible = false;
+            }
+            FlashSprite();
+        }
         //--Movement
         grounded = Physics2D.OverlapCircle(this.transform.position, groundCheckRadius, whatIsGround);
         if (Input.GetButtonUp("Jump") && !stoppedJumping)
@@ -38,10 +53,6 @@ public class Player: MonoBehaviour
             jumpTimeCounter = jumpMaxTime;
             stoppedJumping = false;
         }
-       // Debug.Log("Grounded: " + grounded);
-        Debug.Log("Stopped jumping: " + stoppedJumping);
-       // Debug.Log("ButtonUp: " + Input.GetButtonUp("Jump"));
-        //--Movement
     }
     private void FixedUpdate()
     {
@@ -59,11 +70,16 @@ public class Player: MonoBehaviour
                 jumpTimeCounter -= Time.deltaTime;
             }
         }
-        //--Movement
     }
     public void TakeDamage(int damage)
     {
+        if (isInvincible)
+        {
+            return;
+        }
         health -= damage;
+        isInvincible = true;
+        invicibilityTimer = timeInvincible;
         if (health <= 0)
         {
             PlayerDie();
@@ -72,5 +88,25 @@ public class Player: MonoBehaviour
     void PlayerDie()
     {
         playerIsDead = true;
+    }
+    void FlashSprite()
+    {
+        SpriteRenderer sr = gameObject.GetComponent<SpriteRenderer>();
+        float flashTimer = timeBetweenFlashes;
+        flashTimer -= Time.deltaTime;
+
+        if (flashTimer < 0)
+        {
+            if (sr.enabled)
+            {
+        Debug.Log("SHouldCALL");
+                sr.enabled = false;
+            }
+            else
+            {
+                sr.enabled = true;
+            }
+            flashTimer = timeBetweenFlashes;
+        }
     }
 }
