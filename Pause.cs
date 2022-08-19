@@ -21,4 +21,10 @@ public class Pause : MonoBehaviour
             PauseUI.SetActive(true);
         }
     }
+    private void Update()
+    {
+        if (Input.GetButtonDown("Cancel")){
+            PauseButton();
+        }
+    }
 }

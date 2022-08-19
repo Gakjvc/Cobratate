@@ -12,7 +12,10 @@ public class Player: MonoBehaviour
     public float timeInvincible;
     public float timeBetweenFlashes;
     bool isInvincible;
+    bool firstCall;
+    float flashTimer;
     float invicibilityTimer;
+    SpriteRenderer sr;
     //--Movement
     public float jumpForce = 3f;
     public float groundCheckRadius;
@@ -24,6 +27,7 @@ public class Player: MonoBehaviour
     float jumpTimeCounter;
     private void Start()
     {
+        sr = gameObject.GetComponent<SpriteRenderer>();
         playerIsDead = false;
         //--Movement
         jumpTimeCounter = jumpMaxTime;
@@ -31,15 +35,15 @@ public class Player: MonoBehaviour
     }
     void Update()
     {
-        //this.GetComponent<Animator>().SetFloat("AnimSpeed")
         if (isInvincible)
         {
+            FlashSprite();
             invicibilityTimer -= Time.deltaTime;
             if(invicibilityTimer <=0)
             {
                 isInvincible = false;
+                sr.enabled = true;
             }
-            FlashSprite();
         }
         //--Movement
         grounded = Physics2D.OverlapCircle(this.transform.position, groundCheckRadius, whatIsGround);
@@ -79,6 +83,7 @@ public class Player: MonoBehaviour
         }
         health -= damage;
         isInvincible = true;
+        firstCall = true;
         invicibilityTimer = timeInvincible;
         if (health <= 0)
         {
@@ -91,15 +96,17 @@ public class Player: MonoBehaviour
     }
     void FlashSprite()
     {
-        SpriteRenderer sr = gameObject.GetComponent<SpriteRenderer>();
-        float flashTimer = timeBetweenFlashes;
+        if (firstCall)
+        {
+            flashTimer = timeBetweenFlashes;
+            firstCall = false;
+        }
         flashTimer -= Time.deltaTime;
 
         if (flashTimer < 0)
         {
             if (sr.enabled)
             {
-        Debug.Log("SHouldCALL");
                 sr.enabled = false;
             }
             else

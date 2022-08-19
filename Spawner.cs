@@ -10,10 +10,15 @@ public class Spawner : MonoBehaviour
     public float maxSpeed;
     public float startingCooldown;
     public float cooldownDecrease;
+    public float cooldown;
     public float minCooldown;
     public float gameSpeed;
     public float speedIncreaseBy;
     public float timerCooldown;
+    private void Start()
+    {
+        cooldown = startingCooldown;
+    }
     private void Update()
     {
         if (timerCooldown <= 0)
@@ -29,13 +34,21 @@ public class Spawner : MonoBehaviour
                     SpawnFlyingEnemy();
                     break;
             }
-            if (startingCooldown - cooldownDecrease < minCooldown)
+            if (cooldown - cooldownDecrease < minCooldown)
             {
                 timerCooldown = minCooldown;
             }
             else
             {
-                timerCooldown = startingCooldown - cooldownDecrease;
+                timerCooldown = cooldown;
+                if(cooldown <= minCooldown * 2)
+                {
+                    cooldown -= cooldownDecrease / 2;
+                }
+                else
+                {
+                cooldown -= cooldownDecrease;
+                }
             }
             if((gameSpeed += speedIncreaseBy) != maxSpeed)
             {
