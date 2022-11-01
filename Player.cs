@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class Player: MonoBehaviour
 {
@@ -60,20 +61,7 @@ public class Player: MonoBehaviour
     }
     private void FixedUpdate()
     {
-        //--Movement
-        if (Input.GetButtonDown("Jump") && grounded)
-        {              
-             rb.velocity = new Vector2(rb.velocity.x, jumpForce);
-             stoppedJumping = false;  
-        }
-        if ((Input.GetButton("Jump")) && !stoppedJumping)
-        {
-            if (jumpTimeCounter > 0)
-            {
-                rb.velocity = new Vector2(rb.velocity.x, jumpForce);
-                jumpTimeCounter -= Time.deltaTime;
-            }
-        }
+        ManageInput();
     }
     public void TakeDamage(int damage)
     {
@@ -114,6 +102,26 @@ public class Player: MonoBehaviour
                 sr.enabled = true;
             }
             flashTimer = timeBetweenFlashes;
+        }
+    }
+    void ManageInput()
+    {
+        //Stoping Input from bleeding over the UI
+        if (!EventSystem.current.IsPointerOverGameObject())
+        {
+            if (Input.GetButtonDown("Jump") && grounded)
+            {
+                rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+                stoppedJumping = false;
+            }
+            if ((Input.GetButton("Jump")) && !stoppedJumping)
+            {
+                if (jumpTimeCounter > 0)
+                {
+                    rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+                    jumpTimeCounter -= Time.deltaTime;
+                }
+            }
         }
     }
 }
